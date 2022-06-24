@@ -6,6 +6,14 @@ const chatSchema = new mongoose.Schema({
         required: [true, 'key is missing'],
         unique: true,
     },
+    allowWebhook: {
+        type: Boolean,
+        default: false,
+    },
+    webhookUrl: {
+        type: String,
+        default: null,
+    },
     chat: {
         type: Array,
     },

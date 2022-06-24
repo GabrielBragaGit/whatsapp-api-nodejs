@@ -13,6 +13,18 @@ app.set('views', path.join(__dirname, '../api/views'))
 // app.use(express.static(path.join(__dirname, 'public')));
 global.WhatsAppInstances = {}
 
+
+const client = require('prom-client');
+const collectDefaultMetrics = client.collectDefaultMetrics;
+const Registry = client.Registry;
+const register = new Registry();
+collectDefaultMetrics({ register });
+
+app.get('/metrics', async (req, res) => {
+  res.set('Content-Type', register.contentType);
+  res.end(await register.metrics());
+});
+
 const routes = require('../api/routes/')
 app.use('/', routes)
 app.use(error.handler)

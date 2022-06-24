@@ -2,21 +2,27 @@ const dotenv = require('dotenv')
 const mongoose = require('mongoose')
 const logger = require('pino')()
 dotenv.config()
+const controller = require('./api/controllers/instance.controller');
 
-const app = require('./config/express')
-const config = require('./config/config')
+// "baileys": "git+https://github.com/adiwajshing/Baileys",
+const app = require('./config/express');
+const config = require('./config/config');
 
-let server
+let server;
 
 if (config.mongoose.enabled) {
-    mongoose.connect(config.mongoose.url, config.mongoose.options).then(() => {
-        logger.info('Connected to MongoDB')
-    })
+  mongoose.connect(config.mongoose.url, config.mongoose.options).then(() => {
+    logger.info('Connected to MongoDB');
+  });
 }
 
 server = app.listen(config.port, () => {
-    logger.info(`Listening to port ${config.port}`)
-})
+  logger.info(`Listening to port ${config.port}`);
+  setTimeout(() => {
+    controller.restoreSessions();
+  }, 500);
+});
+
 const exitHandler = () => {
     if (server) {
         server.close(() => {

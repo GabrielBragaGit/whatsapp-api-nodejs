@@ -1,4 +1,22 @@
-module.exports = function processButton(buttons) {
+exports.processButtons = function(buttons) {
+    const preparedButtons = []
+    
+    buttons.map((button, index) => {
+        if (button.type == 'replyButton') {
+            preparedButtons.push({
+                buttonId: index,
+                buttonText: {
+                    displayText: button.title ?? ''
+                },
+                type: 1
+            })
+        }
+    })
+
+    return preparedButtons
+}
+
+exports.processTemplateButton = function(buttons) {
     const preparedButtons = []
 
     buttons.map((button) => {
