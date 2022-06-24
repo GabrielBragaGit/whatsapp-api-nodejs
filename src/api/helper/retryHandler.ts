@@ -1,4 +1,4 @@
-import { proto } from 'baileys';
+import { proto } from '@adiwajshing/baileys';
 export class MessageRetryHandler {
   public messagesMap: Record<string, proto.IMessage>;
 

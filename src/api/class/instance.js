@@ -1,7 +1,7 @@
 /* eslint-disable no-unsafe-optional-chaining */
 const QRCode = require('qrcode');
 const pino = require('pino');
-const { default: makeWASocket, useMultiFileAuthState, DisconnectReason, fetchLatestBaileysVersion } = require('baileys');
+const { default: makeWASocket, useMultiFileAuthState, DisconnectReason, fetchLatestBaileysVersion } = require('@adiwajshing/baileys');
 const { rmSync } = require('fs');
 const { v4: uuidv4 } = require('uuid');
 const path = require('path');
@@ -257,7 +257,7 @@ class WhatsAppInstance {
         webhookData['text'].type = 'chat';
         webhookData['text'].senderName = msg.pushName;
         webhookData['text'].chatName = msg.pushName;
-        webhookData['text'].quotedMsgBody = msg.message.extendedTextMessage?.contextInfo?.quotedMessage.conversation || undefined;
+        webhookData['text'].quotedMsgBody = msg.message.extendedTextMessage?.contextInfo?.quotedMessage?.conversation || undefined;
         webhookData['text'].quotedMsgId = msg.message.extendedTextMessage?.contextInfo?.stanzaId || undefined;
         // }
         // if (config.webhookBase64 || true) {
@@ -351,7 +351,7 @@ class WhatsAppInstance {
               const webhookData = {
                 ack: {
                   id: acknowledge.key.id,
-                  chatId: acknowledge.key.remoteJid.split('@')[0] + '@c.us',
+                  chatId: acknowledge.key?.remoteJid?.split('@')[0] + '@c.us',
                   status: status,
                 },
               };
