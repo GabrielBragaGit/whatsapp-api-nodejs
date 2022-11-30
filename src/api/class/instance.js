@@ -186,7 +186,7 @@ class WhatsAppInstance {
     // on receive new chat
     sock?.ev.on('chats.upsert', async (newChat) => {
       // console.log('Received new chat');
-      //   console.log(newChat);
+      // console.log(newChat);
       // console.log('++++++++++++++++++++++++++++++++++++++++++++++++++++');
       const chats = newChat.map((chat) => {
         return {
@@ -204,7 +204,7 @@ class WhatsAppInstance {
     // on chat change
     sock?.ev.on('chats.update', async (changedChat) => {
       // console.log('on chat change');
-      // console.log(changedChat)
+      // console.log(changedChat);
       // console.log('++++++++++++++++++++++++++++++++++++++++++++++++++++');
 
       changedChat.map(async (chat) => {
@@ -247,8 +247,8 @@ class WhatsAppInstance {
 
     // on new message
     sock?.ev.on('messages.upsert', (m) => {
-      // console.log('on new mssage')
-      // console.log(m);
+      // console.log('on new mssage');
+      // console.dir(m.messages[0].message);
       // console.log('++++++++++++++++++++++++++++++++++++++++++++++++++++')
       if (m.type === 'prepend') this.instance.messages.unshift(...m.messages);
       if (m.type !== 'notify') return;
@@ -315,10 +315,18 @@ class WhatsAppInstance {
             break;
           case 'documentMessage':
             webhookData['text'].type = 'document';
-            webhookData['text'].quotedMsgBody = msg.message.documentMessage?.contextInfo?.quotedMessage?.conversation ?? undefined;
+            webhookData['text'].quotedMsgBody = msg.message.documentMessage?.contextInfo?.quotedMessage?.conversation || undefined;
             webhookData['text'].quotedMsgId = msg.message.documentMessage?.contextInfo?.stanzaId ?? undefined;
             webhookData['text'].caption = msg.message.documentMessage?.fileName;
             webhookData['text'].body = await downloadMessage(msg.message.documentMessage, 'document');
+            break;
+          case 'contactMessage':
+            webhookData['text'].type = 'vcard';
+            webhookData['text'].body = JSON.stringify({ displayName: msg.message.contactMessage.displayName || undefined, vcard: msg.message.contactMessage.vcard });
+            if (msg.message.contactMessage.contextInfo) {
+              webhookData['text'].quotedMsgBody = msg.message.contactMessage.contextInfo?.quotedMessage?.conversation || undefined;
+              webhookData['text'].quotedMsgId = msg.message.contactMessage.contextInfo?.stanzaId || undefined;
+            }
             break;
         }
         // }
