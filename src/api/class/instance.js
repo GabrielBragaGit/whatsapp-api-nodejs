@@ -32,6 +32,27 @@ class WhatsAppInstance {
       console.log(`Get message ${JSON.stringify(key)} for resend, ${msg ? 'found' : 'not_found'}`);
       return msg;
     },
+    patchMessageBeforeSending: (message) => {
+      const requiresPatch = !!(
+        message.buttonsMessage ||
+        // || message.templateMessage
+        message.listMessage
+      );
+      if (requiresPatch) {
+        message = {
+          viewOnceMessage: {
+            message: {
+              messageContextInfo: {
+                deviceListMetadataVersion: 2,
+                deviceListMetadata: {},
+              },
+              ...message,
+            },
+          },
+        };
+      }
+      return message;
+    },
   };
   qrCounter = 0;
   key = '';
@@ -475,12 +496,14 @@ class WhatsAppInstance {
   async sendButtonMessage(to, data) {
     await this.verifyId(this.getWhatsAppId(to));
     await this.setComposingStatus(to);
+    const buttons = processButtons(data.buttons);
 
     const result = await this.instance.sock
       ?.sendMessage(this.getWhatsAppId(to), {
-        buttons: processButtons(data.buttons),
         text: data.text ?? '',
         footer: data.footer ?? '',
+        buttons: buttons,
+        headerType: 1,
       })
       .then(retryHandler.addMessage);
     return result;

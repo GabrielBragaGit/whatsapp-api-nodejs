@@ -23,3 +23,5 @@ COPY --from=builder /src/app/node_modules/ ./node_modules/
 COPY --from=builder /src/app/ ./
 
 CMD ["npm", "run", "start"]
+
+#docker build . --tag dregistry.pljeng.com.br/contact-plus-api:newdev --no-cache && docker push dregistry.pljeng.com.br/contact-plus-api:newdev

@@ -2,17 +2,17 @@ exports.processButtons = function(buttons) {
     const preparedButtons = []
     
     buttons.map((button, index) => {
-        if (button.type == 'replyButton') {
-            preparedButtons.push({
-                buttonId: index,
-                buttonText: {
-                    displayText: button.title ?? ''
-                },
-                type: 1
-            })
-        }
-    })
-
+      const id = index + 1;
+      if (button.type == 'replyButton') {
+        preparedButtons.push({
+          buttonId: 'id' + id,
+          buttonText: {
+            displayText: button.title ?? '',
+          },
+          type: 1,
+        });
+      }
+    });
     return preparedButtons
 }
 
