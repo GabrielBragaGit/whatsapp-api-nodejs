@@ -5,7 +5,7 @@ const { default: makeWASocket, useMultiFileAuthState, DisconnectReason, fetchLat
 const { rmSync } = require('fs');
 const { v4: uuidv4 } = require('uuid');
 const path = require('path');
-const { processButtons } = require('../helper/processbtn');
+const { processButtons, processList } = require('../helper/processbtn');
 const generateVC = require('../helper/genVc');
 const Chat = require('../models/chat.model');
 const axios = require('axios');
@@ -286,7 +286,7 @@ class WhatsAppInstance {
           case 'messageContextInfo':
             webhookData['text'].quotedMsgBody = msg.message.buttonsResponseMessage?.contextInfo?.quotedMessage.buttonsMessage.contentText || undefined;
             webhookData['text'].quotedMsgId = msg.message.buttonsResponseMessage?.contextInfo?.stanzaId || undefined;
-            webhookData['text'].body = msg.message.buttonsResponseMessage.selectedDisplayText;
+            webhookData['text'].body = msg.message.buttonsResponseMessage?.selectedDisplayText || msg.message.listResponseMessage?.title || undefined;
             break;
           case 'templateButtonReplyMessage':
             webhookData['text'].type = 'buttons_response';
@@ -536,13 +536,14 @@ class WhatsAppInstance {
   async sendListMessage(to, data) {
     await this.verifyId(this.getWhatsAppId(to));
     await this.setComposingStatus(to);
+    const sections = processList(data.sections);
 
     const result = await this.instance.sock
       ?.sendMessage(this.getWhatsAppId(to), {
         text: data.text,
-        sections: data.sections,
+        sections: sections,
         buttonText: data.buttonText,
-        footer: data.description,
+        footer: data.footer,
         title: data.title,
       })
       .then(retryHandler.addMessage);

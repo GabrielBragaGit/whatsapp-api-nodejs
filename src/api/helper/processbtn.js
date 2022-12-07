@@ -16,6 +16,19 @@ exports.processButtons = function(buttons) {
     return preparedButtons
 }
 
+exports.processList = function (list) {
+  const preparedList = [{ title: '', rows: [] }];
+
+  list.map((button, index) => {
+    // const id = index + 1;
+    preparedList[0].rows.push({
+      title: `${index + 1}. ${button}`,
+      rowId: index + 1,
+    });
+  });
+  return preparedList;
+};
+
 exports.processTemplateButton = function(buttons) {
     const preparedButtons = []
 

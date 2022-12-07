@@ -115,7 +115,7 @@ exports.Contact = async (req, res) => {
 };
 
 exports.List = async (req, res) => {
-  const data = await WhatsAppInstances[req.query.key].sendListMessage(req.body.id, req.body.msgdata);
+  const data = await WhatsAppInstances[req.query.key].sendListMessage(req.body.id, req.body.listdata);
   return res.status(201).json({ error: false, data: data });
 };
 
