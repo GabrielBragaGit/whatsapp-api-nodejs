@@ -148,8 +148,8 @@ class WhatsAppInstance {
       }
 
       if (qr) {
-        QRCode.toDataURL(qr).then((url) => {
-          if (this.qrCounter <= 3) {
+        QRCode.toDataURL(qr).then(async (url) => {
+          if (this.qrCounter <= 0) {
             this.qrCounter++;
             this.instance.qr = url;
             // this.SendWebhook({
@@ -159,7 +159,8 @@ class WhatsAppInstance {
             //   qrcode: url,
             // });
           } else {
-            this.instance?.sock?.logout();
+            await this.instance?.sock?.logout();
+            await Chat.deleteOne({ key: this.key });
             console.log('QR CODE READ TIMEOUT');
           }
         });
@@ -168,9 +169,6 @@ class WhatsAppInstance {
 
     // on receive all chats
     sock?.ev.on('chats.set', async ({ chats }) => {
-      // console.log('on receive all chats');
-      //   console.log(chats);
-      // console.log('++++++++++++++++++++++++++++++++++++++++++++++++++++');
       const receivedChats = chats.map((chat) => {
         return {
           ...chat,
@@ -178,16 +176,13 @@ class WhatsAppInstance {
         };
       });
       this.instance.chats.push(...receivedChats);
-      receivedChats.forEach(async (chat) => {
-        await this.updateDb(chat);
-      });
+      // receivedChats.forEach(async (chat) => {
+      //   await this.updateDb(chat);
+      // });
     });
 
     // on receive new chat
     sock?.ev.on('chats.upsert', async (newChat) => {
-      // console.log('Received new chat');
-      // console.log(newChat);
-      // console.log('++++++++++++++++++++++++++++++++++++++++++++++++++++');
       const chats = newChat.map((chat) => {
         return {
           ...chat,
@@ -195,18 +190,13 @@ class WhatsAppInstance {
         };
       });
       this.instance.chats.push(...chats);
-      chats.forEach(async (chat) => {
-        await this.updateDb(chat);
-      });
-      //   await this.updateDb(this.instance.chats);
+      // chats.forEach(async (chat) => {
+      //   await this.updateDb(chat);
+      // });
     });
 
     // on chat change
     sock?.ev.on('chats.update', async (changedChat) => {
-      // console.log('on chat change');
-      // console.log(changedChat);
-      // console.log('++++++++++++++++++++++++++++++++++++++++++++++++++++');
-
       changedChat.map(async (chat) => {
         const index = this.instance.chats.findIndex((pc) => pc.id === chat.id);
         const PrevChat = this.instance.chats[index];
@@ -214,7 +204,7 @@ class WhatsAppInstance {
           ...PrevChat,
           ...chat,
         };
-        await this.updateDb(this.instance.chats[index]);
+        // await this.updateDb(this.instance.chats[index]);
       });
     });
 
@@ -248,7 +238,8 @@ class WhatsAppInstance {
     // on new message
     sock?.ev.on('messages.upsert', (m) => {
       // console.log('on new mssage');
-      // console.dir(m.messages[0].message);
+      // console.dir(m.messages[0]);
+      // console.dir(m);
       // console.log('++++++++++++++++++++++++++++++++++++++++++++++++++++')
       if (m.type === 'prepend') this.instance.messages.unshift(...m.messages);
       if (m.type !== 'notify') return;

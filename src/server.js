@@ -19,7 +19,11 @@ if (config.mongoose.enabled) {
 server = app.listen(config.port, () => {
   logger.info(`Listening to port ${config.port}`);
   setTimeout(() => {
-    controller.restoreSessions();
+    try {
+      controller.restoreSessions();
+    } catch (error) {
+      logger.error(error);
+    }
   }, 500);
 });
 

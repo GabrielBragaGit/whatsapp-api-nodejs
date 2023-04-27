@@ -16,10 +16,14 @@ exports.checkInstances = async () => {
 exports.init = async (req, res) => {
   let stop = false;
   const sessions = await Chat.find();
-  sessions.map((chat) => {
+  sessions.map(async (chat) => {
     if (chat.key === req.query.key) {
-      stop = true;
-      return res.status(200).json({ error: true, message: 'Instance already initialized' });
+      if (WhatsAppInstance[chat.key]) {
+        stop = true;
+        return res.status(200).json({ error: true, message: 'Instance already initialized' });
+      } else {
+        await Chat.deleteOne({ key: chat.key });
+      }
     }
   });
   if (!stop) {
@@ -62,6 +66,8 @@ exports.qr = async (req, res) => {
 
 exports.qrbase64 = async (req, res) => {
   try {
+    const chat = await Chat.findOne({ key: req.query.key });
+    if (!chat) throw new Error('Chat nao encontrado na base de dados');
     const qrcode = await WhatsAppInstances[req.query.key]?.instance.qr;
     res.json({
       error: false,
@@ -127,7 +133,7 @@ instanceConnectionTimeout = async (key) => {
         logger.error(error);
       }
     }
-  }, 180000);
+  }, 62000);
 };
 
 exports.restoreSessions = () => {
@@ -142,14 +148,16 @@ exports.restoreSessions = () => {
     });
     restoredSessions.map(async (key) => {
       const chat = await Chat.findOne({ key: key });
+      if (!chat) return;
       const instance = new WhatsAppInstance(key, chat.allowWebhook, chat.webhookUrl);
       instance.init();
       WhatsAppInstances[key] = instance;
       instanceConnectionTimeout(key);
+      logger.info(key, 'instance(s) restored');
     });
-    if (instances.length > 1) logger.info(instances.length - 1 + ' instance(s) restored');
+    // if (instances.length > 1) logger.info(instances.length - 1 + ' instance(s) restored');
   } catch (error) {
-    logger.error(error);
+    return;
   }
 };
 
