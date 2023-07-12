@@ -13,7 +13,7 @@
     "lint:fix": "eslint --fix ."
   },
   "dependencies": {
-    "@adiwajshing/baileys": "github:WhiskeySockets/Baileys",
+    "@whiskeysockets/baileys": "github:WhiskeySockets/Baileys",
     "axios": "^0.27.2",
     "dotenv": "^16.0.3",
     "ejs": "^3.1.7",

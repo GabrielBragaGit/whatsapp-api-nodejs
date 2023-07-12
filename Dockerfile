@@ -1,4 +1,5 @@
-FROM node:14.18.2-alpine as builder
+# FROM node:14.18.2-alpine as builder
+FROM node:16.20.0-alpine as builder
 
 USER root
 RUN apk add git
@@ -14,7 +15,7 @@ RUN npm ci
 COPY --chown=node:node . .
 RUN npm prune --production
 
-FROM node:14.18.2-alpine
+FROM node:16.20.0-alpine
 
 WORKDIR /src/app
 
@@ -24,4 +25,4 @@ COPY --from=builder /src/app/ ./
 
 CMD ["npm", "run", "start"]
 
-#docker build . --tag dregistry.pljeng.com.br/contact-plus-api:newdev --no-cache && docker push dregistry.pljeng.com.br/contact-plus-api:newdev
+#docker build . --tag dregistry.pljeng.com.br/contact-plus-api:newdev2 --no-cache && docker push dregistry.pljeng.com.br/contact-plus-api:newdev2

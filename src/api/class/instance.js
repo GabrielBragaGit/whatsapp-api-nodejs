@@ -1,7 +1,7 @@
 /* eslint-disable no-unsafe-optional-chaining */
 const QRCode = require('qrcode');
 const pino = require('pino');
-const { default: makeWASocket, useMultiFileAuthState, DisconnectReason, fetchLatestBaileysVersion } = require('@adiwajshing/baileys');
+const { default: makeWASocket, useMultiFileAuthState, DisconnectReason, fetchLatestBaileysVersion } = require('@whiskeysockets/baileys');
 const { rmSync } = require('fs');
 const { v4: uuidv4 } = require('uuid');
 const path = require('path');
